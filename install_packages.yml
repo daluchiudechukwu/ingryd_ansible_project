@@ -4,26 +4,68 @@
   become: true
   tasks:
 
-# The first plays are for Ubuntu
+# Plays for all hosts
+
+  - name: Install Updates (Rocky)
+    dnf:
+      update_only: yes
+      update_cache: yes
+    when: ansible_distribution == "Rocky"
+
+  - name: Install Updates (Ubuntu)
+    apt:
+      update_cache: yes
+    when: ansible_distribution == "Ubuntu"
+
+# Plays for web servers
+
+- hosts: web_servers
+  become: true
+  tasks:
 
   - name: Install Apache, PHP support and Htop
     apt:
-      update_cache: yes
       name: 
         - apache2
         - libapache2-mod-php
-        - htop
       state: latest
     when: ansible_distribution == "Ubuntu"
 
-# The following plays are for Rocky Linux
 
   - name: Install Apache, PHP support and Htop
     dnf:
-      update_cache: yes
       name:
         - httpd
         - php
-        - htop
       state: latest
     when: ansible_distribution == "Rocky"
+
+
+# Plays for db servers
+
+- hosts: db_servers
+  become: true
+  tasks:
+
+  - name: Install MariaDB (Rocky)
+    dnf:
+      name: mariadb
+      state: latest
+    when: ansible_distribution == "Rocky"
+
+  - name: Install MariaDB (Ubuntu)
+    apt:
+      name: mariadb-server
+      state: latest
+    when: ansible_distribution == "Ubuntu"
+
+# Plays for file servers
+
+- hosts: file_servers
+  become: true
+  tasks:
+
+  - name: Install Samba
+    package:
+      name: samba
+      state: latest
