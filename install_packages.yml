@@ -4,25 +4,26 @@
   become: true
   tasks:
 
-  - name: Update Repository Index
+# The first plays are for Ubuntu
+
+  - name: Install Apache, PHP support and Htop
     apt:
       update_cache: yes
-    when: ansible_distribution == "Ubuntu"
-
-  - name: Install Apache
-    apt:
-      name: apache2
+      name: 
+        - apache2
+        - libapache2-mod-php
+        - htop
       state: latest
     when: ansible_distribution == "Ubuntu"
 
-  - name: Add php support for Apache
-    apt:
-      name: libapache2-mod-php
-      state: latest
-    when: ansible_distribution == "Ubuntu"
+# The following plays are for Rocky Linux
 
-  - name: Add Htop
-    apt:
-      name: htop
+  - name: Install Apache, PHP support and Htop
+    dnf:
+      update_cache: yes
+      name:
+        - httpd
+        - php
+        - htop
       state: latest
-    when: ansible_distribution == "Ubuntu"
+    when: ansible_distribution == "Rocky"
